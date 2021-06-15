@@ -120,7 +120,7 @@ class WebhookAdapter:
             to_send = utils.to_json(payload)
 
         if auth_token is not None:
-            headers['Authorization'] = f'Bot {auth_token}'
+            headers['Authorization'] = auth_token
 
         if reason is not None:
             headers['X-Audit-Log-Reason'] = urlquote(reason, safe='/ ')
