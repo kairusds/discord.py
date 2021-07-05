@@ -703,8 +703,9 @@ class Message(Hashable):
                 continue
 
     def __repr__(self) -> str:
+        name = self.__class__.__name__
         return (
-            f'<Message id={self.id} channel={self.channel!r} type={self.type!r} author={self.author!r} flags={self.flags!r}>'
+            f'<{name} id={self.id} channel={self.channel!r} type={self.type!r} author={self.author!r} flags={self.flags!r}>'
         )
 
     def _try_patch(self, data, key, transform=None) -> None:
@@ -1224,7 +1225,6 @@ class Message(Hashable):
             flags.suppress_embeds = suppress
             payload['flags'] = flags.value
 
-
         if allowed_mentions is MISSING:
             if self._state.allowed_mentions is not None and self.author.id == self._state.self_id:
                 payload['allowed_mentions'] = self._state.allowed_mentions.to_dict()
@@ -1475,6 +1475,11 @@ class Message(Hashable):
             Starting the thread failed.
         InvalidArgument
             This message does not have guild info attached.
+
+        Returns
+        --------
+        :class:`.Thread`
+            The started thread.
         """
         if self.guild is None:
             raise InvalidArgument('This message does not have guild info attached.')
@@ -1486,7 +1491,7 @@ class Message(Hashable):
             auto_archive_duration=auto_archive_duration,
             type=ChannelType.public_thread.value,
         )
-        return Thread(guild=self.guild, data=data)  # type: ignore
+        return Thread(guild=self.guild, state=self._state, data=data)  # type: ignore
 
     async def reply(self, content: Optional[str] = None, **kwargs) -> Message:
         """|coro|
